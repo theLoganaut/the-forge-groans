@@ -12,8 +12,24 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      keyframes: {
+        'fade-out': {
+          '0%': { backgroundColor: 'rgba(255, 255, 255, 1)' }, 
+          '100%': { backgroundColor: 'rgba(255, 255, 255, 0)' }, 
+        },
+        'fadeIn': {
+          '0%': { backgroundColor: 'rgba(255, 255, 255, 0)' }, 
+          '100%': { backgroundColor: 'rgba(255, 255, 255, 1)' }, 
+        },
+        'opacity-out': {
+          '0%': { opacity: '100%' }, 
+          '100%': { opacity: '0%' }, 
+        },
+      },
       animation: {
-        fadeIn: "fadeIn 3s ease forwards",
+        'fadeIn': 'fadeIn 1s ease-in-out forwards',
+        'fade-out': 'fade-out 0.5s ease-in-out forwards',
+        'opacity-out': 'opacity-out 0.5s ease-in-out forwards',
       },
       animationDelay: {
         500: "500ms",

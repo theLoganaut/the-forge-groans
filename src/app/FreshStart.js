@@ -11,10 +11,68 @@ const FreshStart = ({ setScreen }) => {
   const { functionObj, milestones, forgeLoad, scrapLoad, upgrades } =
     useContext(GameContext);
 
+  const [forgeBarDrop, setForgeBarDrop] = useState(0)
+
+  const [scrapClick, setScrapClick] = useState(false)
+  const [scrapDisabled, setScrapDisabled] = useState(false);
+
+  const [loadClick, setLoadClick] = useState(false)
+  const [loadDisabled, setLoadDisabled] = useState(false);
+
+  const scrapButton = () => {
+
+    const randomIndex = Math.floor(Math.random() * 4)
+    const options = ['Your pick rings through the yard', 'The scrap aches with each strike...', '', ''];
+
+    functionObj.setNewMessage(options[randomIndex])
+
+    setScrapDisabled(true)
+    setScrapClick(true);
+    setTimeout(() => {
+      setScrapClick(false);
+    }, 50); // Reset the button after 5 seconds
+    setTimeout(() => {
+      setScrapDisabled(false)
+    }, 5000);
+    functionObj.scrap.manual()
+  }
+
+  const loadButton = () => {
+    setLoadDisabled(true)
+    setLoadClick(true);
+    setTimeout(() => {
+      setLoadClick(false);
+    }, 50); // Reset the button after 5 seconds
+    setTimeout(() => {
+      setLoadDisabled(false)
+    }, 5000);
+    functionObj.forge.load()
+  }
+
+  useEffect(() => {
+    const startForgeAnim = () => {
+      const intervalId = setInterval(() => {
+        setForgeBarDrop((prev) => {
+          if (prev >= 4) {
+            clearInterval(intervalId);
+            return 0;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(intervalId);
+    };
+    if (forgeLoad >= 5) {
+      startForgeAnim();
+    }
+  }, [forgeLoad]);
+  
+
   return (
-    <div className="border-gray-100 border">
-      <ResourceBar />
-      <DialogBox />
+    <div className="p-8">
+      {/* <ResourceBar />
+      <DialogBox /> */}
       <div className="flex flex-row">
         <div>
           <pre>
@@ -32,8 +90,13 @@ const FreshStart = ({ setScreen }) => {
                 mine{" "}
                 <span>
                   <Button
-                    className="border-gray-100 border px-1"
-                    onClick={() => functionObj.scrap.manual()}
+                    disabled={scrapDisabled}
+                    className={`${
+                      scrapClick
+                        ? "bg-white transition-none"
+                        : "bg-black text-white transition-colors duration-[6000ms] ease-in-out"
+                    } px-1 border border-gray-100`}
+                    onClick={() => scrapButton()}
                     // onClick={() => scrapManual()}
                   >
                     scrap
@@ -46,15 +109,6 @@ const FreshStart = ({ setScreen }) => {
               location={"scrap"}
               upgrade={"pickamount"}
             />
-
-            {/* <div className="flex-grow flex justify-center items-center p-1">
-              <div>
-                upgrade{" "}
-                <span>
-                  <Button className="border-gray-100 border px-1">pick</Button>
-                </span>
-              </div>
-            </div> */}
           </div>
           <FadeIn isHidden={milestones.early.tenScrap}>
             <pre>
@@ -63,11 +117,11 @@ const FreshStart = ({ setScreen }) => {
               <div className="pl-12">(__)(__)</div>
               <div className="pl-20">(__ )</div>
               <div className="pl-6">_______(‾)______</div>
-              <div className="pl-2">,_/__/‾‾‾~~ ~ ~ ‾\_\_</div>
-              <div className="pl-2">|_.|\~_~_ ~ ~~ _~_/|_|</div>
-              <div className="pl-2">|,_|_`|_|~ ~ ~ |_|_|._|</div>
-              <div className="pl-2">|_&lsquo;|_|._|_~~~__|_|._|_|</div>
-              <div className="pl-2">|._|&lsquo;_|_&lsquo;|_|_.|_|`_|,_|</div>
+              <div className="pl-2">,_/__/‾‾‾~{ forgeBarDrop === 1 ? "[]" : "  "}~ ~ ‾\_\_</div>
+              <div className="pl-2">|_.|\~_~_{forgeBarDrop === 2 ? " []" : " ~ "}~ ~_~_/|_|</div>
+              <div className="pl-2">|,_|_`|_|~ ~{forgeBarDrop === 3 ? "[]" : " ~"} |_|_|._|</div>
+              <div className="pl-2">|_&lsquo;|_|._|_{forgeBarDrop === 4 ? "[]" : " ~"}~__|_|._|_|</div>
+              <div className="pl-2">|._|&lsquo;_|_&lsquo;|_|{forgeBarDrop === 5 ? "[]" : "_"}.|_|`_|,_|</div>
               <div className="pl-2">|_`|_.|_|&lsquo;_|,_|_&lsquo;|_|._|</div>
             </pre>{" "}
             <div className="flex flex-col justify-between">
@@ -76,8 +130,13 @@ const FreshStart = ({ setScreen }) => {
                   {" "}
                   <span>
                     <Button
-                      className="border-gray-100 border px-1 mr-1"
-                      onClick={() => functionObj.forge.load()}
+                      disabled={loadDisabled}
+                      className={`${
+                        loadClick
+                          ? "bg-white transition-none"
+                          : "bg-black text-white transition-colors duration-[1000ms] ease-in-out"
+                      } px-1 border border-gray-100`}
+                      onClick={() => loadButton()}
                     >
                       load
                     </Button>
@@ -86,14 +145,12 @@ const FreshStart = ({ setScreen }) => {
                 </div>
               </div>
               <div className="flex-grow flex justify-center items-center mb-4 p-1">
-                <div className="">
-                  increase{" "}
-                  <span>
-                    <Button className="border-gray-100 border px-1">
-                      reserve
-                    </Button>
-                  </span>
-                </div>
+                
+                    <UpgradeButton
+              nextPath={Object.entries(upgrades.forge.loadAmount)}
+              location={"forge"}
+              upgrade={"loadAmount"}
+            />
               </div>
             </div>
           </FadeIn>

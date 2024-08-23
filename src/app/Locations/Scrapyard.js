@@ -1,16 +1,37 @@
 import React, { useContext, useState } from "react";
 import { Button } from "react-bootstrap";
 import { GameContext } from "../StateProvider";
+import UpgradeButton from "../UpgradeButton";
 
 const Scrapyard = ({ setScreen }) => {
-  const { functionObj, milestones } = useContext(GameContext);
+  const { functionObj, milestones, scrapLoad, upgrades } = useContext(GameContext);
 
-  const [scrapVisual, setScrapVisual] = useState(0);
+  const [scrapClick, setScrapClick] = useState(false)
+  const [scrapDisabled, setScrapDisabled] = useState(false);
+
+  const scrapButton = () => {
+
+    const randomIndex = Math.floor(Math.random() * 4)
+    const options = ['Your pick rings through the yard', 'The scrap aches with each strike...', '', ''];
+
+    functionObj.setNewMessage(options[randomIndex])
+
+    setScrapDisabled(true)
+    setScrapClick(true);
+    setTimeout(() => {
+      setScrapClick(false);
+    }, 50); // Reset the button after 5 seconds
+    setTimeout(() => {
+      setScrapDisabled(false)
+    }, 5000);
+    functionObj.scrap.manual()
+  }
+
   return (
     <div>
       <div className="flex flex-row">
         <div>
-          <pre>
+        <pre>
             {" "}
             <div className="pl-6">(%‾|\_.,/#\_.,#(‾*),</div>
             <div className="pl-10">,(_)%\.,,(_)%\.,$#.,</div>
@@ -25,32 +46,36 @@ const Scrapyard = ({ setScreen }) => {
                 mine{" "}
                 <span>
                   <Button
-                    className="border-gray-100 border px-1"
-                    onClick={() => functionObj.scrap.manual(setScrapVisual)}
+                    disabled={scrapDisabled}
+                    className={`${
+                      scrapClick
+                        ? "bg-white transition-none"
+                        : "bg-black text-white transition-colors duration-[6000ms] ease-in-out"
+                    } px-1 border border-gray-100`}
+                    onClick={() => scrapButton()}
+                    // onClick={() => scrapManual()}
                   >
                     scrap
                   </Button>
                 </span>
               </div>
             </div>
-            <div className="flex-grow flex justify-center items-center p-1">
-              <div>
-                upgrade{" "}
-                <span>
-                  <Button className="border-gray-100 border px-1">pick</Button>
-                </span>
-              </div>
-            </div>
+            <UpgradeButton
+              nextPath={Object.entries(upgrades.scrap.pickamount)}
+              location={"scrap"}
+              upgrade={"pickamount"}
+            />
           </div>
         </div>
 
-        <div className="w-16 h-48 mx-auto mt-4">
-          <div className="w-full h-full px-6 border-gray-100 border">
+        <div className="mt-4 w-6 h-48 border-gray-100 border">
             <div
-              style={{ height: `${scrapVisual}%`, backgroundColor: "blue" }}
+              style={{
+                height: `${(scrapLoad / 5) * 100}%`,
+                backgroundColor: "white",
+              }}
             ></div>
           </div>
-        </div>
       </div>
 
       <div className="flex justify-center items-center">

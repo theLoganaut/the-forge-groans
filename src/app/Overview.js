@@ -3,15 +3,17 @@ import ResourceBar from "./ResourceBar"
 import DialogBox from "./DialogBox"
 import { Button } from "react-bootstrap";
 import { GameContext } from "./StateProvider";
+import UpgradeButton from "./UpgradeButton";
+import FadeIn from "./Animations/FadeIn";
 
 const Overview = ({setScreen}) => {
 
-  const { functionObj, milestones } = useContext(GameContext);
+  const { functionObj, milestones, upgrades } = useContext(GameContext);
 
   return (
     <div className="border-gray-100 ">
-      <ResourceBar />
-      <DialogBox />
+      {/* <ResourceBar />
+      <DialogBox /> */}
       {milestones.overview.buildwall == true ? ( <div>
         <pre>
         <div>               <Button>.__.__. </Button></div>
@@ -27,7 +29,7 @@ const Overview = ({setScreen}) => {
         <div>||   #    `    .    #    <Button onClick={()=> setScreen("forge")}>\\_~{"//"}</Button>    ||</div>
         <div>||                _..     ‾‾‾‾     ||</div>
         <div>||  ,  &lsquo;  {milestones.overview.workshop == true ? (<Button onClick={()=> setScreen("workshop")}>/‾‾‾\___| | </Button>) : (<>            </>)}      . &lsquo;   .||</div>
-        <div>||    .   {milestones.overview.workshop == true ? (<Button onClick={()=> setScreen("workshop")}>| # . +_|_\</Button>) : (<Button className="border border-white"> 10 metal  </Button>)}  #      *\   ||</div>
+        <div>||    .   {milestones.overview.workshop == true ? (<Button onClick={()=> setScreen("workshop")}>| # . +_|_\</Button>) : (<UpgradeButton nextPath={Object.entries(upgrades.unlocks.loadAmount)} location={"unlocks"} upgrade={"workshop"} />)}  #      *\   ||</div>
         <div>||  &quot;     {milestones.overview.workshop == true ? (<Button onClick={()=> setScreen("workshop")}>|_#_|,[____]</Button>) : (<>            </>)}   #  &quot;   .  ||</div>
         <div>||      #                #     &lsquo;   ||</div>
         <div>||   {milestones.overview.mechbay == true ? (<>_______ </>) : (<> #  . &quot; </>)}       #  #__   .     ||</div>
@@ -53,9 +55,9 @@ const Overview = ({setScreen}) => {
         <div>        *   &lsquo;       #  <Button onClick={()=> setScreen("forge")}>||~ ~~||</Button>   </div>
         <div>    #    `    .    #    <Button onClick={()=> setScreen("forge")}>\\_~{"//"}</Button>    </div>
         <div>                 _..     ‾‾‾‾     </div>
-        <div>   ,  &lsquo;  {milestones.overview.workshop == true ? (<Button onClick={()=> setScreen("workshop")}>/‾‾‾\___| | </Button>) : (<>            </>)}      . &lsquo;   .</div>
-        <div>     .   {milestones.overview.workshop == true ? (<Button onClick={()=> setScreen("workshop")}>| # . +_|_\</Button>) : (<Button className="border border-white"> 10 metal  </Button>)}  #      *\   </div>
-        <div>   &quot;     {milestones.overview.workshop == true ? (<Button onClick={()=> setScreen("workshop")}>|_#_|,[____]</Button>) : (<>            </>)}   #  &quot;   .  </div>
+        <div>   ,  &lsquo;  {milestones.overview.workshop == true ? (<Button onClick={()=> setScreen("workshop")}><FadeIn isHidden={milestones.overview.workshop}>/‾‾‾\___| | </FadeIn></Button>) : (<>            </>)}      . &lsquo;   .</div>
+        <div>     .   {milestones.overview.workshop == true ? (<Button onClick={()=> setScreen("workshop")}><FadeIn isHidden={milestones.overview.workshop}>| # . +_|_\</FadeIn></Button>) : (<Button onClick={() => functionObj.doUpgrade(upgrades.unlocks.workshop)} className="border border-white"> 10 metal  </Button>)}  #      *\   </div>
+        <div>   &quot;     {milestones.overview.workshop == true ? (<Button onClick={()=> setScreen("workshop")}><FadeIn isHidden={milestones.overview.workshop}>|_#_|,[____]</FadeIn></Button>) : (<>            </>)}   #  &quot;   .  </div>
         <div>       #                #     &lsquo;   </div>
         <div>    {milestones.overview.mechbay == true ? (<>_______ </>) : (<> #  . &quot; </>)}       #  #__   .     </div>
         <div>   {milestones.overview.mechbay == true ? (<Button onClick={()=> setScreen("mechbay")}>{"//"}‾‾@‾‾\\</Button>) : (<>#     . &lsquo;</>)}    # #  {milestones.overview.factory == true ? (<Button onClick={()=> setScreen("factory")}>|###|</Button>) : (<> &quot; . </>)}     #  </div>

@@ -3,18 +3,18 @@ import React, { useEffect, useState } from "react";
 import forgeWorker from "./forgeWorker";
 
 const useGameState = () => {
-  const [scrap, setScrap] = useState(5);
+  const [scrap, setScrap] = useState(30);
   const [scrapLoad, setScrapLoad] = useState(0);
   const [mining, setMining] = useState(false);
   const [forgeLoad, setForgeLoad] = useState(0);
   const [forgeRunning, setForgeRunning] = useState(false);
-  const [metal, setMetal] = useState(5);
+  const [metal, setMetal] = useState(30);
   const [parts, setParts] = useState(0);
   const [automatons, setAutomatons] = useState(0);
   const [unloaded, setUnloaded] = useState(true);
   const [devNoSave, setDevNoSave] = useState(true);
   const [messages, setMessages] = useState(["allo", "where", "do i be"]);
-  const [newMessage, SetNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState("");
 
   const [milestones, setMilestones] = useState({
     early: {
@@ -39,14 +39,14 @@ const useGameState = () => {
       firstautomaton: false,
       buildwall: false,
       wallautomaton: false,
-      workshop: true,
+      workshop: false,
       factorybutton: false,
-      factory: true,
+      factory: false,
       explore: false,
       hpbar: false,
       waveone: false,
       mechbaybutton: false,
-      mechbay: true,
+      mechbay: false,
     },
     workshop: {
       partsperpress: false,
@@ -116,14 +116,65 @@ const useGameState = () => {
           sub: "second",
           passed: false,
           resource: "metal",
-          cost: 1,
+          cost: 5,
           pre: "upgrade",
           button: "pick",
-          post: "two",
+          // post: "two",
         },
       },
     },
-    forge: [],
+    forge: {
+      loadAmount: {
+        first: {
+          sub: "first",
+          passed: false,
+          resource: "metal",
+          cost: 10,
+          pre: "increase",
+          button: "reserve",
+        },
+        second: {
+          sub: "second",
+          passed: false,
+          resource: "metal",
+          cost: 25,
+          pre: "increase",
+          button: "reserve",
+          // post: "two",
+        },
+      },
+    },
+    unlocks: {
+      workshop: {
+        // passed: false,
+        resource: "metal",
+        cost: 10,
+        pre: "",
+        button: "changed",
+        trigger: () => setMilestones((prev) => {
+          const newState = { ...prev };
+  
+          newState.overview.workshop = !prev.overview.workshop;
+          newState.overview.factorybutton = !prev.overview.factorybutton;
+  
+          return newState;
+        })
+      },
+      factory: {
+        // passed: false,
+        resource: "metal",
+        cost: 10,
+        pre: "",
+        button: "10 Metal",
+        trigger: () => setMilestones((prev) => {
+          const newState = { ...prev };
+  
+          newState.overview.factory = !prev.overview.factory;
+  
+          return newState;
+        })
+      },
+    },
   });
 
   //* scrap
@@ -155,6 +206,7 @@ const useGameState = () => {
       return () => clearInterval(miningInt);
     };
     if (mining === true && scrapLoad === 0) {
+      setScrapLoad(1)
       console.log("wtf");
       increaseScrapInterval();
     }
@@ -259,8 +311,9 @@ const useGameState = () => {
 
   //* milestone tracker
   useEffect(() => {
+    
     if (scrap >= 10 && milestones.early.tenScrap === false) {
-      SetNewMessage("The forge groans for scrap...");
+      setNewMessage("The forge groans for scrap...");
       setMilestones((prev) => {
         const newState = { ...prev };
 
@@ -269,7 +322,7 @@ const useGameState = () => {
         return newState;
       });
     }
-    if (metal >= 10) {
+    if (metal >= 2 && milestones.early.tenMetal === false) {
       setMilestones((prev) => {
         const newState = { ...prev };
 
@@ -281,16 +334,32 @@ const useGameState = () => {
   }, [scrap, metal, milestones]);
 
   // updating any upgrades
-  const doUpgrade = (resource, cost, location, upgrade, sub) => {
+  const doUpgrade = (upgradeObj, location, upgrade) => {
+    const {resource, cost, sub} = upgradeObj
+
     const temp = eval(resource);
 
     if (temp > cost) {
       console.log("allo");
-      setUpgrades((prev) => {
-        const temp = { ...prev };
-        temp[location][upgrade][sub].passed = true;
-        return temp;
-      });
+      if (sub) {
+        setUpgrades((prev) => {
+          const temp = { ...prev };
+          temp[location][upgrade][sub].passed = true;
+          return temp;
+        });
+      } else {
+        console.log("allo")
+        //* no sub means its a milestone upgrade, at least for now
+        // setUpgrades((prev) => {
+        //   const temp = { ...prev };
+        //   temp[location][upgrade].passed = true;
+        //   return temp;
+        // });
+        //trigger unlock
+
+        // temp[location][upgrade].trigger()
+        upgradeObj.trigger()
+      }
       switch (resource) {
         case "scrap":
           setScrap((prev) => prev - cost);
@@ -323,6 +392,7 @@ const useGameState = () => {
       delete: deleteSave,
     },
     doUpgrade,
+    setNewMessage,
   };
 
   return {

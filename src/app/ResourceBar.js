@@ -5,14 +5,14 @@ const ResourceBar = () => {
   const { scrap, metal, parts, automatons, functionObj } =
     useContext(GameContext);
   return (
-    <div className="border-1 h-6 w-full border-gray-100 border flex flex-row justify-around">
+    <div className="border-1 w-full border-gray-100 border flex flex-row justify-around">
       <button
         className="mx-2 border border-white text-xs"
         onClick={() => functionObj.files.printSave()}
       >
         PRT
       </button>
-      <div className="mx-2">{scrap} SCP</div>
+      <div className="mx-2 text-xs">{scrap} SCRAP</div>
       <div className="mx-2">{metal} MTL</div>
       <div className="mx-2">{parts} PRT</div>
       <div className="mx-2">{automatons} AMT</div>
